@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>실시간 소수 생성기</title>
+    <title>Real-time Prime Numbers</title>
     <style>
         body {
             background-color: #0d1117;
@@ -17,7 +17,7 @@
             overflow: hidden;
         }
         #result {
-            font-size: 8vw;
+            font-size: 10vw;
             font-weight: bold;
             color: #58a6ff;
             text-shadow: 0 0 30px rgba(88, 166, 255, 0.5);
@@ -40,7 +40,6 @@
         const resultDiv = document.getElementById('result');
         let currentNumber = 2;
 
-        // 다음 소수를 찾아 반환하는 함수
         function getNextPrime(num) {
             let next = num + 1;
             while (!isPrime(next)) {
@@ -50,19 +49,16 @@
         }
 
         function step() {
-            // 현재 소수를 화면 중앙에 표시
             resultDiv.textContent = currentNumber.toLocaleString();
-
-            // 숫자가 커질수록 다음 소수로 넘어가는 대기 시간을 길게 설정
+            
+            // 숫자가 커질수록 속도가 점점 느려지도록 대기 시간 조절
             let delay = 30 + Math.log10(currentNumber) * 15;
 
-            // 다음 소수 준비
             currentNumber = getNextPrime(currentNumber);
-
             setTimeout(step, delay);
         }
 
-        // 최초 실행
+        // 실행 시작
         setTimeout(step, 100);
     </script>
 </body>
