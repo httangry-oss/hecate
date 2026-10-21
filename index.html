@@ -38,7 +38,7 @@
         }
 
         const resultDiv = document.getElementById('result');
-        let currentNumber = 3; // 다음에 보여줄 숫자를 미리 3으로 설정
+        let currentNumber = 3; // 다음에 보여줄 소수
         let stepCount = 0;
 
         function getNextPrime(num) {
@@ -50,23 +50,38 @@
         }
 
         function step() {
-            // 이번에 보여줄 숫자를 화면에 렌더링
             resultDiv.textContent = currentNumber.toLocaleString();
             
-            // 다음 숫자를 미리 계산
+            // 다음 소수 미리 계산
             currentNumber = getNextPrime(currentNumber);
             
-            // 이번 회차의 딜레이 계산 (첫 턴은 10,000ms = 10초)
+            // 첫 번째 전환(2 -> 3) 이후부터 적용될 딜레이 계산
+            // stepCount가 0일 때는 이 함수가 첫 번째 호출이므로, 다음 턴부터 적용됨
             let delay = Math.max(5, 10000 * Math.exp(-stepCount / 50));
             stepCount++;
 
             setTimeout(step, delay);
         }
 
-        // 페이지가 열리고 화면에 '2'가 확실히 그려진 직후, 딱 10초 뒤에 첫 step(3으로 변환) 실행
-        setTimeout(() => {
-            step();
-        }, 10000);
+        // 브라우저 렌더링 완성 직후, 정확한 타이머 인터벌을 위해 
+        // 화면에 '2'가 확실히 고정된 상태로 딱 10,000ms(10초)를 채우는 엄격한 방식
+        window.addEventListener('load', () => {
+            const startTime = Date.now();
+            const targetDuration = 10000; // 정확히 10초
+
+            function checkInitialDelay() {
+                const elapsedTime = Date.now() - startTime;
+                if (elapsedTime >= targetDuration) {
+                    // 10초가 경과했으면 첫 번째 변환 실행 및 이후 루프 시작
+                    step();
+                } else {
+                    // 아직 10초가 안 되었다면 남은 시간 동안 재확인 (정밀 제어)
+                    requestAnimationFrame(checkInitialDelay);
+                }
+            }
+
+            requestAnimationFrame(checkInitialDelay);
+        });
     </script>
 </body>
 </html>
