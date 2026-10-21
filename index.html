@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prime</title>
+    <!-- 코딩 폰트 적용을 위한 Google Fonts (Fira Code) 로드 -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@700&display=swap" rel="stylesheet">
     <style>
         body {
             background-color: #0d1117;
@@ -18,7 +20,8 @@
             font-size: 10vw;
             font-weight: bold;
             color: #58a6ff;
-            font-family: 'Courier New', Courier, monospace;
+            /* 윈도우/맥의 대표적인 코딩 폰트(Consolas, Fira Code, Monaco 등) 우선순위 적용 */
+            font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
             text-shadow: 0 0 30px rgba(88, 166, 255, 0.5);
             text-align: center;
         }
@@ -49,12 +52,8 @@
 
         function step() {
             resultDiv.textContent = currentNumber.toLocaleString();
-            let delay = 30 + Math.log10(currentNumber) * 15;
-            currentNumber = getNextPrime(currentNumber);
-            setTimeout(step, delay);
-        }
+            
+            // 처음엔 느리게, 숫자가 커질수록 점점 빠르게(가속) 변환되도록 수정
+            let delay = Math.max(5, 300 - Math.log10(currentNumber) * 70);
 
-        setTimeout(step, 100);
-    </script>
-</body>
-</html>
+            currentNumber = getNextPrime(currentNumber);
