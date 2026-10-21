@@ -12,35 +12,21 @@
             margin: 0;
             height: 100vh;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             overflow: hidden;
         }
-        h1 {
-            color: #8b949e;
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            letter-spacing: 2px;
-        }
         #result {
-            font-size: 5vw;
+            font-size: 8vw;
             font-weight: bold;
             color: #58a6ff;
-            text-shadow: 0 0 20px rgba(88, 166, 255, 0.4);
+            text-shadow: 0 0 30px rgba(88, 166, 255, 0.5);
             text-align: center;
-        }
-        #subtext {
-            margin-top: 15px;
-            font-size: 0.9rem;
-            color: #484f58;
         }
     </style>
 </head>
 <body>
-    <h1>REAL-TIME PRIME GENERATOR</h1>
     <div id="result">2</div>
-    <div id="subtext">검사 중인 숫자: 2</div>
 
     <script>
         function isPrime(num) {
@@ -52,29 +38,32 @@
         }
 
         const resultDiv = document.getElementById('result');
-        const subtextDiv = document.getElementById('subtext');
         let currentNumber = 2;
 
-        function step() {
-            // 소수인지 판별
-            if (isPrime(currentNumber)) {
-                resultDiv.textContent = currentNumber.toLocaleString();
+        // 다음 소수를 찾아 반환하는 함수
+        function getNextPrime(num) {
+            let next = num + 1;
+            while (!isPrime(next)) {
+                next++;
             }
-            subtextDiv.textContent = `검사 중인 숫자: ${currentNumber.toLocaleString()}`;
+            return next;
+        }
 
-            // 숫자가 커질수록 대기 시간(딜레이)을 길게 만듦 (점점 느려짐)
-            // 예: 숫자가 억(100,000,000) 단위가 되면 비선형적으로 대기 시간이 늘어납니다.
-            let delay = 10 + Math.log10(currentNumber) * 15; 
+        function step() {
+            // 현재 소수를 화면 중앙에 표시
+            resultDiv.textContent = currentNumber.toLocaleString();
 
-            currentNumber++;
+            // 숫자가 커질수록 다음 소수로 넘어가는 대기 시간을 길게 설정
+            let delay = 30 + Math.log10(currentNumber) * 15;
 
-            // 다음 실행 예약
+            // 다음 소수 준비
+            currentNumber = getNextPrime(currentNumber);
+
             setTimeout(step, delay);
         }
 
         // 최초 실행
-        setTimeout(step, 50);
+        setTimeout(step, 100);
     </script>
 </body>
 </html>
-
