@@ -9,25 +9,38 @@
             background-color: #0d1117;
             color: #58a6ff;
             font-family: 'Courier New', Courier, monospace;
-            padding: 20px;
             margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
         }
         h1 {
-            color: #c9d1d9;
-            font-size: 1.5rem;
-            border-bottom: 1px solid #30363d;
-            padding-bottom: 10px;
+            color: #8b949e;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
         }
         #result {
-            font-size: 1.2rem;
-            line-height: 1.6;
-            word-break: break-all;
+            font-size: 5vw;
+            font-weight: bold;
+            color: #58a6ff;
+            text-shadow: 0 0 20px rgba(88, 166, 255, 0.4);
+            text-align: center;
+        }
+        #subtext {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #484f58;
         }
     </style>
 </head>
 <body>
-    <h1>Real-time Prime Numbers</h1>
-    <div id="result"></div>
+    <h1>REAL-TIME PRIME GENERATOR</h1>
+    <div id="result">2</div>
+    <div id="subtext">검사 중인 숫자: 2</div>
 
     <script>
         function isPrime(num) {
@@ -39,23 +52,29 @@
         }
 
         const resultDiv = document.getElementById('result');
+        const subtextDiv = document.getElementById('subtext');
         let currentNumber = 2;
 
-        function findPrimes() {
-            // 브라우저 멈춤 현상을 방지하기 위해 한 턴에 20개씩 빠르게 계산
-            let output = "";
-            for (let i = 0; i < 20; i++) {
-                if (isPrime(currentNumber)) {
-                    output += currentNumber + ", ";
-                }
-                currentNumber++;
+        function step() {
+            // 소수인지 판별
+            if (isPrime(currentNumber)) {
+                resultDiv.textContent = currentNumber.toLocaleString();
             }
-            resultDiv.innerHTML += output;
-            window.scrollTo(0, document.body.scrollHeight); // 화면이 아래로 자동 스크롤
+            subtextDiv.textContent = `검사 중인 숫자: ${currentNumber.toLocaleString()}`;
+
+            // 숫자가 커질수록 대기 시간(딜레이)을 길게 만듦 (점점 느려짐)
+            // 예: 숫자가 억(100,000,000) 단위가 되면 비선형적으로 대기 시간이 늘어납니다.
+            let delay = 10 + Math.log10(currentNumber) * 15; 
+
+            currentNumber++;
+
+            // 다음 실행 예약
+            setTimeout(step, delay);
         }
 
-        // 30밀리초(0.03초)마다 반복 실행
-        setInterval(findPrimes, 30);
+        // 최초 실행
+        setTimeout(step, 50);
     </script>
 </body>
 </html>
+
