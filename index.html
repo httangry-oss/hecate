@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prime</title>
-    <!-- 코딩 폰트 적용을 위한 Google Fonts (Fira Code) 로드 -->
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -20,7 +19,6 @@
             font-size: 10vw;
             font-weight: bold;
             color: #58a6ff;
-            /* 코딩 프로그램에서 쓰이는 모노스페이스 고딕체 적용 */
             font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
             text-shadow: 0 0 30px rgba(88, 166, 255, 0.5);
             text-align: center;
@@ -39,9 +37,8 @@
             return true;
         }
 
-        const resultDiv = document.getElementById('result');
         let currentNumber = 2;
-        let stepCount = 0; // 진행 횟수 카운터
+        let stepCount = 0;
 
         function getNextPrime(num) {
             let next = num + 1;
@@ -52,19 +49,26 @@
         }
 
         function step() {
+            const resultDiv = document.getElementById('result');
+            if (!resultDiv) {
+                console.error("result 요소를 찾을 수 없습니다.");
+                return;
+            }
+
             resultDiv.textContent = currentNumber.toLocaleString();
             
-            // 처음에는 딜레이를 길게(약 400ms) 주어 매우 천천히 시작하고,
-            // 횟수가 누적될수록 지수 함수 형태(-)로 딜레이가 부드럽게 줄어들며 자연스럽게 빨라지도록 설정
-            // 최소 딜레이는 5ms로 제한하여 눈에 무리가 가지 않도록 함
             let delay = Math.max(5, 400 * Math.exp(-stepCount / 100));
 
             stepCount++;
             currentNumber = getNextPrime(currentNumber);
+            
             setTimeout(step, delay);
         }
 
-        setTimeout(step, 100);
+        // DOM이 완전히 로드된 후 실행되도록 보장
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(step, 100);
+        });
     </script>
 </body>
 </html>
