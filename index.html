@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prime</title>
-    <!-- 코딩 폰트 적용을 위한 Google Fonts (Fira Code) 로드 -->
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -39,8 +38,8 @@
         }
 
         const resultDiv = document.getElementById('result');
-        let currentNumber = 2;
-        let stepCount = 0; // 진행 횟수 카운터
+        let currentNumber = 3; // 다음에 보여줄 숫자를 미리 3으로 설정
+        let stepCount = 0;
 
         function getNextPrime(num) {
             let next = num + 1;
@@ -51,8 +50,23 @@
         }
 
         function step() {
+            // 이번에 보여줄 숫자를 화면에 렌더링
             resultDiv.textContent = currentNumber.toLocaleString();
             
-            // 처음 시작 딜레이를 10,000ms(10초)로 설정하고, 
-            // 횟수가 누적될수록 부드럽게 줄어들도록 설정 (최소 딜레이 5ms)
-            let delay = Math.max(5, 10000 * Math.exp
+            // 다음 숫자를 미리 계산
+            currentNumber = getNextPrime(currentNumber);
+            
+            // 이번 회차의 딜레이 계산 (첫 턴은 10,000ms = 10초)
+            let delay = Math.max(5, 10000 * Math.exp(-stepCount / 50));
+            stepCount++;
+
+            setTimeout(step, delay);
+        }
+
+        // 페이지가 열리고 화면에 '2'가 확실히 그려진 직후, 딱 10초 뒤에 첫 step(3으로 변환) 실행
+        setTimeout(() => {
+            step();
+        }, 10000);
+    </script>
+</body>
+</html>
