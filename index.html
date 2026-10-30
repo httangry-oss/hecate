@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prime</title>
+    <title>Prime Live Server</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -11,77 +11,61 @@
             margin: 0;
             height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
         }
         #result {
             font-size: 10vw;
             font-weight: bold;
-            color: #58a6ff;
-            font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
-            text-shadow: 0 0 30px rgba(88, 166, 255, 0.5);
+            color: #ffffff; /* 화이트 색상으로 변경 */
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.4); /* 은은한 흰색 네온 효과 */
             text-align: center;
+        }
+        #timer {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            color: #8b949e;
         }
     </style>
 </head>
 <body>
-    <div id="result">2</div>
+    <div id="result">연결 중...</div>
+    <div id="timer">서버에서 실시간 데이터를 받아오고 있습니다</div>
 
     <script>
-        function isPrime(num) {
-            if (num < 2) return false;
-            for (let i = 2; i <= Math.sqrt(num); i++) {
-                if (num % i === 0) return false;
-            }
-            return true;
-        }
-
         const resultDiv = document.getElementById('result');
-        let currentNumber = 3; // 다음에 보여줄 소수
-        let stepCount = 0;
+        const timerDiv = document.getElementById('timer');
+        let targetTime = 0;
+        let currentStep = 0;
 
-        function getNextPrime(num) {
-            let next = num + 1;
-            while (!isPrime(next)) {
-                next++;
-            }
-            return next;
-        }
+        // 서버의 실시간 중계 통로(/stream)에 연결
+        const evtSource = new EventSource('/stream');
 
-        function step() {
-            resultDiv.textContent = currentNumber.toLocaleString();
-            
-            // 다음 소수 미리 계산
-            currentNumber = getNextPrime(currentNumber);
-            
-            // 첫 번째 전환(2 -> 3) 이후부터 적용될 딜레이 계산
-            // stepCount가 0일 때는 이 함수가 첫 번째 호출이므로, 다음 턴부터 적용됨
-            let delay = Math.max(5, 10000 * Math.exp(-stepCount / 50));
-            stepCount++;
+        evtSource.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            // 서버가 보내준 소수를 그대로 화면에 출력
+            resultDiv.textContent = data.number.toLocaleString();
+            targetTime = data.nextChangeTime;
+            currentStep = data.step;
+        };
 
-            setTimeout(step, delay);
-        }
-
-        // 브라우저 렌더링 완성 직후, 정확한 타이머 인터벌을 위해 
-        // 화면에 '2'가 확실히 고정된 상태로 딱 10,000ms(10초)를 채우는 엄격한 방식
-        window.addEventListener('load', () => {
-            const startTime = Date.now();
-            const targetDuration = 10000; // 정확히 10초
-
-            function checkInitialDelay() {
-                const elapsedTime = Date.now() - startTime;
-                if (elapsedTime >= targetDuration) {
-                    // 10초가 경과했으면 첫 번째 변환 실행 및 이후 루프 시작
-                    step();
+        // 남은 시간 카운트다운 표시용 UI 루프
+        function updateTimerUI() {
+            if (targetTime > 0) {
+                const remaining = Math.max(0, targetTime - Date.now());
+                if (remaining > 100 && currentStep < 150) {
+                    timerDiv.textContent = `다음 숫자까지: ${(remaining / 1000).toFixed(1)}초 (${(currentStep + 1).toLocaleString()}번째 소수)`;
                 } else {
-                    // 아직 10초가 안 되었다면 남은 시간 동안 재확인 (정밀 제어)
-                    requestAnimationFrame(checkInitialDelay);
+                    timerDiv.textContent = `서버 실시간 중계 중 (${(currentStep + 1).toLocaleString()}번째 소수)`;
                 }
             }
+            requestAnimationFrame(updateTimerUI);
+        }
 
-            requestAnimationFrame(checkInitialDelay);
-        });
+        requestAnimationFrame(updateTimerUI);
     </script>
 </body>
 </html>
